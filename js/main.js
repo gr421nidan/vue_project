@@ -1,16 +1,3 @@
-Vue.component('product-details', {
-    props: {
-        details: {
-            type: Array,
-            required: true
-        }
-    },
-    template: `
-    <ul>
-      <li v-for="detail in details">{{ detail }}</li>
-    </ul>`
-})
-
 Vue.component('product', {
     props: {
         premium: {
@@ -20,17 +7,19 @@ Vue.component('product', {
     },
     template: `
    <div class="product">
+   
     <div class="product-image">
            <img :src="image" :alt="altText"/>
        </div>
-
+    
        <div class="product-info">
            <h1>{{ title }}</h1>
            <p v-if="inStock">In stock</p>
            <p v-else>Out of Stock</p>
-          
+           <ul>
+               <li v-for="detail in details">{{ detail }}</li>
+           </ul>
           <p>Shipping: {{ shipping }}</p>
-           <product-details :details="details"></product-details>
            <div
                    class="color-box"
                    v-for="(variant, index) in variants"
@@ -38,11 +27,6 @@ Vue.component('product', {
                    :style="{ backgroundColor:variant.variantColor }"
                    @mouseover="updateProduct(index)"
            ></div>
-          
-
-           <div class="cart">
-               <p>Cart({{ cart }})</p>
-           </div>
 
            <button
                    v-on:click="addToCart"
@@ -76,17 +60,17 @@ Vue.component('product', {
                     variantQuantity: 0
                 }
             ],
-            cart: 0
         }
     },
     methods: {
-        addToCart() {
-            this.cart += 1
-        },
         updateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
-        }
+        },
+        addToCart() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+        },
+
     },
     computed: {
         title() {
@@ -110,6 +94,14 @@ Vue.component('product', {
 let app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        }
+
     }
+
 })
