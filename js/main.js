@@ -125,19 +125,14 @@ Vue.component('product-tabs', {
           </ul>
            
         </div>
-        <div v-show="selectedTab === 'Sizes'">
-     
-            <ul>
-                <li v-for="sizes in sizes ">{{ sizes }}</li>
-            </ul>
-        </div>
+        
      </div>
 `,
 
 
     data() {
         return {
-            tabs: ['Reviews', 'Make a Review','Shipping', 'Details', 'Sizes'],
+            tabs: ['Reviews', 'Make a Review','Shipping', 'Details'],
             selectedTab: ['Reviews', 'Shipping']  // устанавливается с помощью @click
 
         }
@@ -165,9 +160,8 @@ Vue.component('product', {
             </div>
            <p v-if="inStock">In stock</p>
            <p v-else>Out of Stock</p>
-            <span v-if="onSale">On Sale</span>
-            <span v-else>Not On Sale</span>
-            <br></br>
+            <span>{{onSale}}</span>
+            <br>
             
            <div
                    class="color-box"
@@ -176,6 +170,17 @@ Vue.component('product', {
                    :style="{ backgroundColor:variant.variantColor }"
                    @mouseover="updateProduct(index)"
            ></div>
+           <br>
+           <div>
+           <select name="drop1" id="Select1">
+              <option value="volvo">S</option>
+              <option value="saab">M</option>
+              <option value="mercedes">L</option>
+              <option value="audi">XL</option>
+              <option value="audi">XXL</option>
+              <option value="audi">XXXL</option>
+            </select>
+            </div>
           
            <button
                    v-on:click="addToCart"
@@ -187,7 +192,7 @@ Vue.component('product', {
            <button v-on:click="deleteFromCart" class="deleteFromCart">Delete</button> 
      
        </div>           
-       <product-tabs :reviews="reviews" :shipping="shipping" :details=" details" :sizes="sizes"></product-tabs>
+       <product-tabs :reviews="reviews" :shipping="shipping" :details=" details" ></product-tabs>
     </div>
 
  `,
@@ -201,19 +206,21 @@ Vue.component('product', {
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
             inventory: 100,
-            onSale: true,
+
             variants: [
                 {
                     variantId: 2234,
                     variantColor: 'green',
                     variantImage: "./assets/vmSocks-green-onWhite.jpg",
-                    variantQuantity: 10
+                    variantQuantity: 10,
+                    onSale: true,
                 },
                 {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 0
+                    variantQuantity: 0,
+                    onSale: false,
                 }
             ],
             reviews: []
@@ -248,9 +255,21 @@ Vue.component('product', {
             } else {
                 return 2.99
             }
-        }
-    },
 
+        },
+        onSale() {
+            if (this.variants[this.selectedVariant].onSale) {
+                return "On Sale";
+            } else {
+
+            }
+        },
+        mounted() {
+            eventBus.$on('review-submitted', productReview => {
+                this.reviews.push(productReview)
+            });
+        }
+    }
 
 });
 
@@ -270,9 +289,5 @@ let app = new Vue({
 
 
     },
-    mounted() {
-        eventBus.$on('review-submitted', productReview => {
-            this.reviews.push(productReview)
-        });
-    }
+
 })
